@@ -29,7 +29,7 @@ def main() :
 	s = pd.Series(data,index)
 	s.plot.bar()
 	plt.show()
-	mth.export_data(data,"output","dealer_bust.txt")
+	mth.export_data2json(data,"output","dealer_bust.txt")
 
 if __name__ == "__main__":
 	main()
