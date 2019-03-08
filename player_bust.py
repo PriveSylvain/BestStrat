@@ -6,27 +6,16 @@ import pprint
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import os
 
-def faitesVosJeux(joueurs,mise=5) :
-	for j in joueurs :
-		j.miser(mise)
-def init_data_i(indice) :
-	data={}
-	data["players"]={}
-	data["dealer"]={}
-	data["stat_bust"] = {}
-	return data
-def start_stat() :
-	"""attribuer O.5 chance de tirer une carte à tout couple compte dealer compte joueur"""
-	data = [0]*10
-	narray = {}
-	for i in range(4,22):
-		s = pd.Series(data,index = range(2,12))
-		narray[i]=s
-	df = pd.DataFrame(narray)
-	df2 = pd.DataFrame(narray)
-	return df
-	
+def fill_df_proba(df_proba,df_main,df_bust) :
+	for cj in df_main :
+		for cc in df_main[cj].keys() :
+			if df_main[cj][cc] != 0 :
+				df_proba[cj][cc] = "%.4f"%(df_bust[cj][cc]/df_main[cj][cc])
+			else :
+				df_proba[cj][cc] = 0
+	return df_proba	
 def strat(joueur,pioche) :
 	joueur.tirer(pioche)
 	if joueur.calculer() > 21 :
@@ -36,20 +25,18 @@ def strat(joueur,pioche) :
 		joueur.bust = False
 		joueur.play = False
 
-
 def main() :
 
-	joueurs,croupier,pioche = mth.initialiser_partie()
+	joueurs,croupier,pioche = mth.initialiser_partie(nombre_joueurs = 10,nombre_paquets = 6,solde_depart = 10000)
 	pioche.shuffle(5)
 	pioche.burn(5)
 
-	df_main = start_stat()
-	df_bust = start_stat()
+	df_main = mth.start_stat()
+	df_bust = mth.start_stat()
 
-	for i in range(200) :
-		faitesVosJeux(joueurs)
+	for i in range(5000) :
+		mth.faitesVosJeux(joueurs)
 		croupier.distribuer(joueurs,pioche)
-		print(i)
 		score_c = croupier.calculer()
 		for j in joueurs :
 			score_j = j.calculer()
@@ -60,15 +47,17 @@ def main() :
 				df_bust[score_j][score_c]+=1
 		
 		croupier.appliquer_strategie(pioche)
+		#mth.who_won(joueurs,croupier)
 
-		mth.who_won(joueurs,croupier)
 		for j in joueurs :
 			j.reset()
 		croupier.reset()
 		pioche.reset()
 		i+=1
-	print(df_main)
-	print(df_bust)
+	#note : la fonction de distribution de df_main peu etre interessant par la suite...
+	df_proba = mth.start_stat()
+	df_proba = fill_df_proba(df_proba,df_main,df_bust)
+	mth.export_df2csv(df_proba,"output",__file__)
 
 if __name__ == "__main__":
 	main()
