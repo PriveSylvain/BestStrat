@@ -49,8 +49,7 @@ def start_stat(p=0.0) :
 		narray[i]=s
 	df = pd.DataFrame(narray)
 	return df
-def export_data2json(data,directory,filename) :
-	full_path = os.path.join(directory,filename)
+def export_data2json(data,full_path) :
 	with open(full_path,'w',encoding="utf-8") as output_file :
 		json.dump(data,output_file,sort_keys=True,indent=4)
 def export_df2csv(df,directory,filename) :
