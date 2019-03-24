@@ -50,7 +50,7 @@ def main() :
 	pioche.burn(5)
 
 	OUTPUT_FILE = "data_dealer_bust.json"
-	path_output_file = os.path.join("output",OUTPUT_FILE)
+	json_f_path = os.path.join("output",OUTPUT_FILE)
 
 	data = {}
 	data["n"] = 1000
@@ -74,15 +74,7 @@ def main() :
 			data["1ere carte"][value]["compte_final"][str(compte)] += 1 
 		mth.reset_all(joueurs,croupier,pioche)
 
-	if data_already_exist(path_output_file) :
-		data_from_json = load_json_file(path_output_file)
-		if test_data_structure(data_from_json,data) :
-			data = merge_data(data_from_json,data)
-		else : 
-			print("json file data cannot be merged to data : its structure doesn't match with the current structure.")
-	else : 
-		print("%s file does not exist. it will be generated in few seconds"%(path_output_file))
-	mth.export_data2json(data,path_output_file)
+	mth.check_and_export_data2json(data,json_f_path)
 
 	prob_bust = {}
 	for value in data["1ere carte"] :
