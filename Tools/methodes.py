@@ -1,11 +1,12 @@
 #!/usr/bin/env python
 from .objects import *
 import json
+import os
 import pandas as pd
+import logging
 
 
 def initialiser_partie(nombre_joueurs = 6,nombre_paquets = 6,solde_depart = 1000) :
-	print("début de partie")
 	croupier = Croupier()
 	pioche = Pioche(nb_deck = nombre_paquets)
 	joueurs = []
@@ -50,15 +51,16 @@ def start_stat(p=0.0) :
 	df = pd.DataFrame(narray)
 	return df
 
-def check_and_export_data2json(data,json_f_path) :
+def check_and_export_data2json(data,directory,filename) :
+	json_f_path = os.path.join(directory,filename)
 	if data_already_exist(json_f_path) :
 		data_from_json = load_json_file(json_f_path)
 		if test_data_structure(data_from_json,data) :
 			data = merge_data(data_from_json,data)
 		else : 
-			print("json file data cannot be merged to data : its structure doesn't match with the current structure.")
+			logging.warning("json file cannot be merged to data : its structure doesn't match with the current structure.")
 	else : 
-		print("%s file does not exist. new one will be generated in few seconds"%(json_f_path))
+		logging.warning("%s file does not exist. new one will be generated in few seconds"%(filename))
 
 	export_data2json(data,json_f_path)
 def data_already_exist(json_f_path) :
@@ -66,8 +68,11 @@ def data_already_exist(json_f_path) :
 	return(os.path.exists(json_f_path))
 def load_json_file(json_f_path) :
 	"""load data from the existing json file"""
-	with open(json_f_path,'r') as json_f :
-		return json.load(json_f)
+	if os.path.exists(json_f_path) :
+		with open(json_f_path,'r') as json_f :
+			return json.load(json_f)
+	else :
+		logging.warning("json file not found")
 def test_data_structure(data_in,data_out,result = False) :
 	"""test if data structure from json file is compatible with the generated one"""
 	if type(data_in) == type(data_out) :
@@ -85,7 +90,7 @@ def test_data_structure(data_in,data_out,result = False) :
 def merge_data(data_in,data_out) :
 	"""once loaded from the json file, data is merge to the new generated data"""
 	if type(data_in) == dict :
-		for key in data_in :
+		for key in data_in.keys() :
 			data_out[key] = merge_data(data_in[key],data_out[key])
 	else :
 		data_out += data_in
@@ -99,7 +104,6 @@ def export_df2csv(df,directory,filename) :
 	if not os.path.exists(directory) :
 		os.mkdir(directory)
 	output_file = os.path.join(directory,filename.replace(".py",".csv"))
-	print(output_file)
 	df.to_csv(output_file, sep = '\t')
 
 def main() :
