@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from Tools import objects
+from Tools.objects import *
 from Tools import methodes as mth
 import pandas as pd
 import numpy as np
@@ -14,10 +15,7 @@ MISE = 0
 def main() :
     """ 
     """
-    joueurs,croupier,pioche = mth.initialiser_partie(nombre_joueurs = 10,nombre_paquets = 6,solde_depart = 10000)
-    
-    pioche.shuffle(5)
-    pioche.burn(5)
+    joueurs,croupier,pioche = mth.initialiser_partie()
     
     PLAYER_JSON_F = "data_player_bust.json"
     DEALER_JSON_F = "data_dealer_bust.json"
@@ -51,10 +49,13 @@ def main() :
             li_y.append(data[x][y])
         li_x.append(li_y)
     
-    print(li_x)
+    HEATMAP_base_strat_PNG = "heatmap_stratégie_de_base.png"
+
+    # print(li_x)
     plt.matshow(li_x)
     plt.title('test')
     plt.show()
+    #plt.savefig(os.path.join("output",HEATMAP_base_strat_PNG))
 
 if __name__ == "__main__":
 	main()
