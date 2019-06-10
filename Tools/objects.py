@@ -69,7 +69,14 @@ class Joueur(object):
 		for carte in self.main :
 			str_joueur += "\t%s"%(carte)
 		return str_joueur
-	def tirer(self,pioche) :
+	def tirer(self,pioche,iteration=1,cards = []) :
+		if iteration > 0 :
+			card = self._tirer(pioche)
+			cards.append(card)			
+			iteration -= 1
+			self.tirer(pioche,iteration,cards)
+		return cards
+	def _tirer(self,pioche) :
 		"""retourne la carte ajoutée à la main du joueur"""
 		if self.play == True :
 			carte = pioche.tirer()
@@ -182,10 +189,13 @@ class Croupier(object) :
 		if AS and compte <= 11 :
 			compte += 10
 		return compte
-	def distribuer(self,joueurs,pioche) :
-		for j in joueurs :
-			j.tirer(pioche)
-			j.tirer(pioche)
+	def distribuer(self,instance,pioche) :
+		if isinstance(instance,list) : 
+			for joueur in instance :
+				joueur.tirer(pioche)
+				joueur.tirer(pioche)
+		elif isinstance(instance,Joueur) :
+			instance.tirer(pioche,2)
 		self.tirer(pioche)
 	def appliquer_strategie(self,pioche) :
 		compte = self.calculer()

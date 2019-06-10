@@ -24,29 +24,37 @@ def jouer_partie(joueurs,croupier,pioche) :
 	for j in joueurs :
 		j.appliquer_strategie(pioche)
 	croupier.appliquer_strategie(pioche)
-def who_won(joueurs,croupier) :
-	C_compte = croupier.calculer()
-	for j in joueurs : 
-		if j.play and not j.bust :
-			if croupier.bust or j.calculer() > C_compte :
-				j.crediter()
-			elif j.calculer() < C_compte :
-				j.debiter()
-		else :
-			j.debiter()
+def _who_won(joueur,croupier) :
+	C_compte = croupier.calculer() 
+	if joueur.play and not joueur.bust :
+		if croupier.bust or joueur.calculer() > C_compte :
+			joueur.crediter()
+		elif joueur.calculer() < C_compte :
+			joueur.debiter()
+	else :
+		joueur.debiter()
+def who_won(instance,croupier) :
+	if isinstance(instance,list) :
+		for joueur in instance:
+			_who_won(joueur,croupier)
+	elif isinstance(instance,Joueur) :
+		_who_won(instance,croupier)
 def reset_all(joueurs,croupier,pioche) :
-	for j in joueurs :
-		j.reset()
+	if isinstance(joueurs,list) :
+		for j in joueurs :
+			j.reset()
+	elif isinstance(joueurs,Joueur) :
+		joueurs.reset()
 	croupier.reset()
 	pioche.reset()
 def faitesVosJeux(joueurs,mise=1) :
 	for j in joueurs :
 		j.miser(mise)
-def start_stat(p=0.0) :
+def start_stat(l=range(4,22),L=range(2,12),p=0.0) :
 	data = [p]*10
 	narray = {}
-	for i in range(4,22):
-		s = pd.Series(data,index = range(2,12))
+	for i in l:
+		s = pd.Series(data,index = L)
 		narray[i]=s
 	df = pd.DataFrame(narray)
 	return df
